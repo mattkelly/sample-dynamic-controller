@@ -63,9 +63,15 @@ func main() {
 		cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
 	)
 
+	foosLister := cache.NewGenericLister(dynamicInformer.GetIndexer(),
+		schema.GroupResource{
+			Group:    "samplecontroller.k8s.io",
+			Resource: "foos"},
+	)
+
 	controller := NewController(kubeClient, dynamicClient,
 		kubeInformerFactory.Apps().V1().Deployments(),
-		dynamicInformer)
+		dynamicInformer, foosLister)
 
 	go kubeInformerFactory.Start(stopCh)
 	go dynamicInformer.Run(stopCh)
